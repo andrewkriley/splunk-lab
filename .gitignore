@@ -1,0 +1,20 @@
+# Environment variables - never commit secrets
+.env
+
+# macOS
+.DS_Store
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+logs/
+
+# Splunk installer downloads
+*.tgz
+*.deb
+*.rpm
