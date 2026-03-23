@@ -1,0 +1,33 @@
+services:
+  splunk:
+    image: ${SPLUNK_IMAGE:-splunk/splunk:latest}
+    container_name: splunk
+    hostname: splunk-enterprise
+    env_file: .env
+    ports:
+      - "8000:8000"    # Splunk Web UI
+      - "8089:8089"    # Management / REST API
+      - "9997:9997"    # Splunk forwarder receiving
+      - "8088:8088"    # HEC (HTTP Event Collector)
+      - "514:514/udp"  # Syslog UDP
+    volumes:
+      - /opt/splunk/var:/opt/splunk/var
+      - /opt/splunk/etc:/opt/splunk/etc
+      - /opt/splunk-import:/opt/splunk/import-data
+    ulimits:
+      nofile:
+        soft: 64000
+        hard: 64000
+    deploy:
+      resources:
+        limits:
+          memory: ${SPLUNK_MEMORY_LIMIT:-8G}
+        reservations:
+          memory: ${SPLUNK_MEMORY_RESERVATION:-4G}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 120s

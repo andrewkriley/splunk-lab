@@ -1,5 +1,5 @@
 #!/bin/bash
-# configure-splunk.sh - Post-install configuration for Splunk Enterprise
+# configure-splunk.sh - Wait for Splunk to be ready, then configure HEC and (optionally) apply a license
 
 set -euo pipefail
 
@@ -12,50 +12,82 @@ if [[ ! -f "$ENV_FILE" ]]; then
 fi
 
 source "$ENV_FILE"
+source "${SCRIPT_DIR}/lib.sh"
 
-echo "==> Configuring Splunk Enterprise on container ${LXC_ID}"
+HTTP_PORT="${SPLUNK_HTTP_PORT:-8000}"
+MGMT_PORT="${SPLUNK_MGMT_PORT:-8089}"
+HEC_PORT="${SPLUNK_HEC_PORT:-8088}"
+INDEX_PORT="${SPLUNK_INDEX_PORT:-9997}"
+AUTH="${SPLUNK_ADMIN_USER:-admin}:${SPLUNK_ADMIN_PASSWORD}"
 
-ssh "${PROXMOX_USER}@${PROXMOX_HOST}" -p "${PROXMOX_PORT}" bash <<EOF
-set -euo pipefail
+# ---------------------------------------------------------------------------
+# 1. Wait for Splunk Web to be reachable
+# ---------------------------------------------------------------------------
+echo "==> Waiting for Splunk to be ready at http://${LXC_IP_ADDR}:${HTTP_PORT}..."
+max_wait=300
+elapsed=0
+while ! lxc_ssh "curl -sf http://localhost:${HTTP_PORT}" &>/dev/null; do
+    if [[ $elapsed -ge $max_wait ]]; then
+        echo "ERROR: Splunk did not become ready within ${max_wait}s."
+        echo "       Check container status: ssh root@${LXC_IP_ADDR} docker compose -f /opt/splunk-docker/docker-compose.yml ps"
+        exit 1
+    fi
+    echo -n "."
+    sleep 10
+    elapsed=$((elapsed + 10))
+done
+echo " ready."
 
-SPLUNK="/opt/splunk/bin/splunk"
-AUTH="-auth ${SPLUNK_ADMIN_USER}:${SPLUNK_ADMIN_PASSWORD}"
+# ---------------------------------------------------------------------------
+# 2. Enable HEC and create a token
+# ---------------------------------------------------------------------------
+echo "==> Enabling HTTP Event Collector..."
+lxc_ssh "docker exec splunk /opt/splunk/bin/splunk http-event-collector enable -auth '${AUTH}'" || true
 
-# Enable HTTP Event Collector
-echo "==> Enabling HTTP Event Collector (HEC) on port ${SPLUNK_HEC_PORT}..."
-pct exec ${LXC_ID} -- bash -c "
-    \$SPLUNK http-event-collector enable \$AUTH
-    \$SPLUNK http-event-collector create default-hec \$AUTH \
-        --index main \
-        --sourcetype _json
-"
+if [[ -z "${SPLUNK_HEC_TOKEN:-}" ]]; then
+    echo "==> Creating HEC token (default-hec)..."
+    hec_token=$(lxc_ssh "docker exec splunk /opt/splunk/bin/splunk http-event-collector create default-hec \
+        -auth '${AUTH}' --index main --sourcetype _json -output_mode json" \
+        | jq -r '.entry[0].content.token // empty' 2>/dev/null || true)
 
-# Enable receiving (indexer port for forwarders)
-echo "==> Enabling receiving on port ${SPLUNK_INDEX_PORT}..."
-pct exec ${LXC_ID} -- bash -c "
-    \$SPLUNK enable listen ${SPLUNK_INDEX_PORT} \$AUTH
-"
-
-# Apply license if provided
-if [[ -n "${SPLUNK_LICENSE_FILE:-}" && -f "${SPLUNK_LICENSE_FILE}" ]]; then
-    echo "==> Applying Splunk license..."
-    # Copy license into container and apply
-    pct push ${LXC_ID} "${SPLUNK_LICENSE_FILE}" /tmp/splunk.license
-    pct exec ${LXC_ID} -- bash -c "\$SPLUNK add licenses /tmp/splunk.license \$AUTH && rm /tmp/splunk.license"
+    if [[ -n "$hec_token" ]]; then
+        echo "    HEC token: ${hec_token}"
+        echo "    Add SPLUNK_HEC_TOKEN=${hec_token} to your .env to retain it."
+    else
+        echo "    Warning: could not retrieve HEC token — configure manually in Splunk Web."
+    fi
 else
-    echo "==> No license file set — running as Splunk Free Trial."
+    echo "==> HEC token already set in .env (${SPLUNK_HEC_TOKEN:0:8}...)."
+    hec_token="${SPLUNK_HEC_TOKEN}"
 fi
 
-# Restart Splunk to apply changes
-echo "==> Restarting Splunk..."
-pct exec ${LXC_ID} -- bash -c "\$SPLUNK restart"
+# ---------------------------------------------------------------------------
+# 3. Enable forwarder receiving
+# ---------------------------------------------------------------------------
+echo "==> Enabling forwarder receiving on port ${INDEX_PORT}..."
+lxc_ssh "docker exec splunk /opt/splunk/bin/splunk enable listen ${INDEX_PORT} -auth '${AUTH}'" || true
 
-echo "==> Configuration complete."
-EOF
+# ---------------------------------------------------------------------------
+# 4. Apply license file (optional)
+# ---------------------------------------------------------------------------
+if [[ -n "${SPLUNK_LICENSE_FILE:-}" && -f "${SPLUNK_LICENSE_FILE}" ]]; then
+    echo "==> Applying license file (${SPLUNK_LICENSE_FILE})..."
+    lxc_scp "${SPLUNK_LICENSE_FILE}" "root@${LXC_IP_ADDR}:/tmp/splunk.license"
+    lxc_ssh "docker exec splunk /opt/splunk/bin/splunk add licenses /tmp/splunk.license -auth '${AUTH}'"
+    lxc_ssh "rm /tmp/splunk.license"
+    lxc_ssh "docker exec splunk /opt/splunk/bin/splunk restart"
+    echo "    License applied."
+fi
 
-LXC_IP_ADDR="$(echo ${LXC_IP} | cut -d'/' -f1)"
+# ---------------------------------------------------------------------------
+# 5. Summary
+# ---------------------------------------------------------------------------
 echo ""
 echo "==> Splunk is ready."
-echo "    Web UI:  http://${LXC_IP_ADDR}:${SPLUNK_HTTP_PORT}"
-echo "    HEC:     http://${LXC_IP_ADDR}:${SPLUNK_HEC_PORT}/services/collector"
-echo "    Indexer: ${LXC_IP_ADDR}:${SPLUNK_INDEX_PORT}"
+echo "    Web UI:  http://${LXC_IP_ADDR}:${HTTP_PORT}"
+echo "    HEC:     http://${LXC_IP_ADDR}:${HEC_PORT}/services/collector"
+echo "    Indexer: ${LXC_IP_ADDR}:${INDEX_PORT}"
+echo "    API:     https://${LXC_IP_ADDR}:${MGMT_PORT}"
+if [[ -n "${hec_token:-}" ]]; then
+    echo "    HEC token: ${hec_token}"
+fi

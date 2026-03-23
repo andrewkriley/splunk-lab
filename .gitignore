@@ -14,7 +14,6 @@
 *.log
 logs/
 
-# Splunk installer downloads
-*.tgz
-*.deb
-*.rpm
+# License files
+*.lic
+*.license

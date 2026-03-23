@@ -1,5 +1,5 @@
 #!/bin/bash
-# destroy.sh - Stop and destroy the Splunk LXC container
+# destroy.sh - Stop and destroy the Splunk LXC container via Proxmox API
 
 set -euo pipefail
 
@@ -12,17 +12,18 @@ if [[ ! -f "$ENV_FILE" ]]; then
 fi
 
 source "$ENV_FILE"
+source "${SCRIPT_DIR}/lib.sh"
 
 echo "WARNING: This will permanently destroy container ${LXC_ID} (${LXC_HOSTNAME})."
 read -rp "Type 'yes' to confirm: " confirm
 [[ "$confirm" == "yes" ]] || { echo "Aborted."; exit 1; }
 
-ssh "${PROXMOX_USER}@${PROXMOX_HOST}" -p "${PROXMOX_PORT}" bash <<EOF
-set -euo pipefail
 echo "==> Stopping container ${LXC_ID}..."
-pct stop ${LXC_ID} || true
-sleep 3
+upid=$(pve_api POST "/nodes/${PROXMOX_NODE}/lxc/${LXC_ID}/status/stop" | jq -r '.data')
+wait_for_task "$upid" || true  # container may already be stopped
+
 echo "==> Destroying container ${LXC_ID}..."
-pct destroy ${LXC_ID}
-echo "==> Done."
-EOF
+upid=$(pve_api DELETE "/nodes/${PROXMOX_NODE}/lxc/${LXC_ID}?purge=1" | jq -r '.data')
+wait_for_task "$upid"
+
+echo "==> Done. Container ${LXC_ID} has been destroyed."
