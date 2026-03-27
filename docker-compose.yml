@@ -1,0 +1,47 @@
+services:
+
+  # ── Splunk Enterprise ──────────────────────────────────────────────────────
+  splunk:
+    image: splunk/splunk:latest
+    container_name: splunk
+    hostname: splunk
+    environment:
+      SPLUNK_START_ARGS: --accept-license
+      SPLUNK_PASSWORD: ${SPLUNK_PASSWORD}          # set in .env — required
+      SPLUNK_HEC_TOKEN: ${SPLUNK_HEC_TOKEN}        # pre-set HEC token for easy testing
+    ports:
+      # All ports bound to 127.0.0.1 — accessible from this machine only
+      - "127.0.0.1:8000:8000"   # Splunk Web UI
+      - "127.0.0.1:8088:8088"   # HTTP Event Collector (HEC)
+      - "127.0.0.1:8089:8089"   # Splunk REST / management API
+    volumes:
+      - splunk-var:/opt/splunk/var                                          # persist indexes across restarts
+      - ./buttercup_app:/opt/splunk/etc/apps/buttercup_app                  # Buttercup sample data app
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:8000/en-US/account/login"]
+      interval: 15s
+      timeout: 10s
+      retries: 20
+      start_period: 90s    # Splunk takes ~60s on first boot
+
+  # ── Splunk MCP Server ──────────────────────────────────────────────────────
+  splunk-mcp:
+    build: ./mcp                                   # builds from ./mcp/Dockerfile
+    container_name: splunk-mcp
+    environment:
+      TRANSPORT: sse
+      HOST: 0.0.0.0
+      PORT: 8050
+      SPLUNK_HOST: splunk                          # Docker service name — internal network
+      SPLUNK_PORT: 8089                            # Splunk REST API port
+      SPLUNK_USERNAME: admin
+      SPLUNK_PASSWORD: ${SPLUNK_PASSWORD}
+      VERIFY_SSL: "false"                          # self-signed cert on local Splunk instance
+    ports:
+      - "127.0.0.1:8050:8050"   # MCP SSE endpoint — localhost only, no auth required
+    depends_on:
+      splunk:
+        condition: service_healthy                 # wait for Splunk to be ready before starting MCP
+
+volumes:
+  splunk-var:    # named volume — Splunk indexes and data persist here

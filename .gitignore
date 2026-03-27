@@ -1,0 +1,18 @@
+# Secrets — never commit
+.env
+
+# macOS
+.DS_Store
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Splunk license files
+*.lic
+*.license
+
+# Logs
+*.log

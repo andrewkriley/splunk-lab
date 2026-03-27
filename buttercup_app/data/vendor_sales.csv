@@ -1,0 +1,71 @@
+date,vendor,product,units_sold,revenue
+2025-01-02,GameZone,Jimi Hendrix Backpack,12,599.88
+2025-01-02,TechShop,Flash Drive 16GB,45,449.55
+2025-01-02,GadgetWorld,Tsunami Headphones,8,719.92
+2025-01-02,PlayStore,Lucky Duck Toys,30,299.70
+2025-01-02,GameHub,Thunder Laptop,3,4499.97
+2025-01-03,GameZone,Thunder Laptop,2,2999.98
+2025-01-03,TechShop,Jimi Hendrix Backpack,18,899.82
+2025-01-03,GadgetWorld,Flash Drive 16GB,60,599.40
+2025-01-03,PlayStore,Tsunami Headphones,11,989.89
+2025-01-03,GameHub,Lucky Duck Toys,25,249.75
+2025-01-04,GameZone,Lucky Duck Toys,35,349.65
+2025-01-04,TechShop,Thunder Laptop,4,5999.96
+2025-01-04,GadgetWorld,Jimi Hendrix Backpack,22,1099.78
+2025-01-04,PlayStore,Flash Drive 16GB,55,549.45
+2025-01-04,GameHub,Tsunami Headphones,14,1259.86
+2025-01-05,GameZone,Tsunami Headphones,9,809.91
+2025-01-05,TechShop,Lucky Duck Toys,40,399.60
+2025-01-05,GadgetWorld,Thunder Laptop,5,7499.95
+2025-01-05,PlayStore,Jimi Hendrix Backpack,16,799.84
+2025-01-05,GameHub,Flash Drive 16GB,70,699.30
+2025-01-06,GameZone,Flash Drive 16GB,50,499.50
+2025-01-06,TechShop,Tsunami Headphones,13,1169.87
+2025-01-06,GadgetWorld,Lucky Duck Toys,28,279.72
+2025-01-06,PlayStore,Thunder Laptop,6,8999.94
+2025-01-06,GameHub,Jimi Hendrix Backpack,20,999.80
+2025-01-07,GameZone,Jimi Hendrix Backpack,14,699.86
+2025-01-07,TechShop,Flash Drive 16GB,80,799.20
+2025-01-07,GadgetWorld,Thunder Laptop,7,10499.93
+2025-01-07,PlayStore,Lucky Duck Toys,33,329.67
+2025-01-07,GameHub,Tsunami Headphones,10,899.90
+2025-01-08,GameZone,Thunder Laptop,4,5999.96
+2025-01-08,TechShop,Jimi Hendrix Backpack,25,1249.75
+2025-01-08,GadgetWorld,Flash Drive 16GB,65,649.35
+2025-01-08,PlayStore,Tsunami Headphones,17,1529.83
+2025-01-08,GameHub,Lucky Duck Toys,42,419.58
+2025-01-09,GameZone,Lucky Duck Toys,38,379.62
+2025-01-09,TechShop,Thunder Laptop,5,7499.95
+2025-01-09,GadgetWorld,Jimi Hendrix Backpack,19,949.81
+2025-01-09,PlayStore,Flash Drive 16GB,72,719.28
+2025-01-09,GameHub,Tsunami Headphones,12,1079.88
+2025-01-10,GameZone,Tsunami Headphones,15,1349.85
+2025-01-10,TechShop,Lucky Duck Toys,50,499.50
+2025-01-10,GadgetWorld,Thunder Laptop,8,11999.92
+2025-01-10,PlayStore,Jimi Hendrix Backpack,23,1149.77
+2025-01-10,GameHub,Flash Drive 16GB,90,899.10
+2025-01-11,GameZone,Flash Drive 16GB,55,549.45
+2025-01-11,TechShop,Tsunami Headphones,18,1619.82
+2025-01-11,GadgetWorld,Lucky Duck Toys,44,439.56
+2025-01-11,PlayStore,Thunder Laptop,9,13499.91
+2025-01-11,GameHub,Jimi Hendrix Backpack,28,1399.72
+2025-01-12,GameZone,Jimi Hendrix Backpack,17,849.83
+2025-01-12,TechShop,Flash Drive 16GB,95,949.05
+2025-01-12,GadgetWorld,Thunder Laptop,10,14999.90
+2025-01-12,PlayStore,Lucky Duck Toys,48,479.52
+2025-01-12,GameHub,Tsunami Headphones,20,1799.80
+2025-01-13,GameZone,Thunder Laptop,6,8999.94
+2025-01-13,TechShop,Jimi Hendrix Backpack,30,1499.70
+2025-01-13,GadgetWorld,Flash Drive 16GB,100,999.00
+2025-01-13,PlayStore,Tsunami Headphones,22,1979.78
+2025-01-13,GameHub,Lucky Duck Toys,55,549.45
+2025-01-14,GameZone,Lucky Duck Toys,42,419.58
+2025-01-14,TechShop,Thunder Laptop,7,10499.93
+2025-01-14,GadgetWorld,Jimi Hendrix Backpack,26,1299.74
+2025-01-14,PlayStore,Flash Drive 16GB,110,1099.90
+2025-01-14,GameHub,Tsunami Headphones,16,1439.84
+2025-01-15,GameZone,Tsunami Headphones,19,1709.81
+2025-01-15,TechShop,Lucky Duck Toys,60,599.40
+2025-01-15,GadgetWorld,Thunder Laptop,11,16499.89
+2025-01-15,PlayStore,Jimi Hendrix Backpack,32,1599.68
+2025-01-15,GameHub,Flash Drive 16GB,120,1199.80
