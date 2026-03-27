@@ -1,3 +1,5 @@
+name: splunk-lab
+
 services:
 
   # ── Splunk Enterprise ──────────────────────────────────────────────────────
@@ -34,7 +36,10 @@ services:
 
   # ── Splunk MCP Server ──────────────────────────────────────────────────────
   splunk-mcp:
-    build: ./mcp                                   # builds from ./mcp/Dockerfile
+    build:
+      context: ./mcp
+      tags:
+        - splunk-mcp:latest
     container_name: splunk-mcp
     environment:
       TRANSPORT: sse
