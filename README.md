@@ -21,7 +21,7 @@ docker compose up  →  Splunk Web UI + MCP server ready
 
 ```bash
 git clone <this-repo>
-cd partner-mcp-splunk-lab
+cd splunk-lab
 cp .env.example .env
 ```
 
