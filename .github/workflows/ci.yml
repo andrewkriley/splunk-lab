@@ -41,15 +41,15 @@ jobs:
       - name: Start stack
         run: docker compose up -d --build
 
-      # Splunk takes ~60–90s on amd64; longer on arm64 via emulation.
-      # Poll every 5s up to 300s total.
+      # Splunk takes ~60–90s on amd64; up to 10 min on arm64 via QEMU emulation.
+      # Poll every 10s up to 600s total.
       - name: Wait for Splunk
         run: |
-          echo "Waiting for Splunk (up to 300s)..."
+          echo "Waiting for Splunk (up to 600s)..."
           for i in $(seq 1 60); do
-            curl -sf http://localhost:8000/en-US/account/login > /dev/null && echo "Splunk ready after $((i*5))s" && break
-            echo "  waiting... ($((i*5))s)"
-            sleep 5
+            curl -sf http://localhost:8000/en-US/account/login > /dev/null && echo "Splunk ready after $((i*10))s" && break
+            echo "  waiting... ($((i*10))s)"
+            sleep 10
           done
 
       # MCP container starts after Splunk is healthy — give it a moment to bind

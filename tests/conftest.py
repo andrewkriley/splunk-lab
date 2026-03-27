@@ -82,6 +82,8 @@ def run_search(session, spl, timeout=30):
             "search": spl,
             "output_mode": "json",
             "exec_mode": "oneshot",
+            "earliest_time": "0",   # epoch 0 = all time; avoids missing events with old timestamps
+            "latest_time": "now",
         },
         timeout=timeout,
     )
