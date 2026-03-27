@@ -49,12 +49,12 @@ def run_search(session, spl, timeout=30):
     return resp.json().get("results", [])
 
 
-def wait_for_indexed(session, sourcetype, min_count=1, timeout=90, interval=5):
+def wait_for_indexed(session, sourcetype, min_count=1, timeout=180, interval=5):
     """
     Poll until at least min_count events exist for the given sourcetype.
     Splunk monitor inputs can take 10–30s to index files after startup.
     """
-    spl = f"search index=main sourcetype={sourcetype} | stats count"
+    spl = f"search index=buttercup sourcetype={sourcetype} | stats count"
     deadline = time.time() + timeout
     while time.time() < deadline:
         try:

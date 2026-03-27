@@ -73,16 +73,16 @@ Three datasets are auto-indexed into the `main` index:
 
 ```spl
 # Traffic by HTTP status code
-index=main sourcetype=access_combined | stats count by status
+index=buttercup sourcetype=access_combined | stats count by status
 
 # Sales revenue by vendor
-index=main sourcetype=buttercup_sales | stats sum(revenue) as total_revenue by vendor | sort -total_revenue
+index=buttercup sourcetype=buttercup_sales | stats sum(revenue) as total_revenue by vendor | sort -total_revenue
 
 # Top products by units sold
-index=main sourcetype=buttercup_sales | stats sum(units_sold) as total_units by product | sort -total_units
+index=buttercup sourcetype=buttercup_sales | stats sum(units_sold) as total_units by product | sort -total_units
 
 # Revenue trend over time
-index=main sourcetype=buttercup_sales | timechart span=1d sum(revenue) by vendor
+index=buttercup sourcetype=buttercup_sales | timechart span=1d sum(revenue) by vendor
 ```
 
 ---
@@ -99,7 +99,7 @@ index=main sourcetype=buttercup_sales | timechart span=1d sum(revenue) by vendor
 
 Your data is immediately searchable:
 ```spl
-index=main sourcetype=csv | head 20
+index=buttercup sourcetype=csv | head 20
 ```
 
 ### From an online source (HEC)
@@ -122,7 +122,7 @@ curl -k https://localhost:8088/services/collector/event \
 
 Then search for your events:
 ```spl
-index=main sourcetype=my_sourcetype
+index=buttercup sourcetype=my_sourcetype
 ```
 
 ---
