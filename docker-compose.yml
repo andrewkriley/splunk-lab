@@ -24,7 +24,13 @@ services:
       interval: 15s
       timeout: 10s
       retries: 20
-      start_period: 90s    # Splunk takes ~60s on first boot
+      start_period: 90s    # Splunk takes ~60s on first boot; longer on amd64-via-emulation on arm
+    deploy:
+      resources:
+        limits:
+          memory: 4g       # Splunk minimum; increase to 8g for heavier workloads
+        reservations:
+          memory: 2g
 
   # ── Splunk MCP Server ──────────────────────────────────────────────────────
   splunk-mcp:
@@ -43,6 +49,10 @@ services:
     ports:
       - "127.0.0.1:8050:8050"   # MCP SSE endpoint — localhost only, no auth required
     restart: unless-stopped                        # restart if the process exits unexpectedly
+    deploy:
+      resources:
+        limits:
+          memory: 512m
     depends_on:
       splunk:
         condition: service_healthy                 # wait for Splunk to be ready before starting MCP
