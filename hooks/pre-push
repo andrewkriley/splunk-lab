@@ -5,6 +5,20 @@
 #   cp hooks/pre-push .git/hooks/pre-push
 #   chmod +x .git/hooks/pre-push
 
+# Reject direct pushes to protected branches immediately — before any Docker work.
+# Git passes push refs on stdin: <local-ref> <local-sha> <remote-ref> <remote-sha>
+PROTECTED_BRANCHES="main"
+while read local_ref local_sha remote_ref remote_sha; do
+  branch="${remote_ref#refs/heads/}"
+  for protected in $PROTECTED_BRANCHES; do
+    if [ "$branch" = "$protected" ]; then
+      echo "[pre-push] ERROR: Direct push to '$branch' is not allowed."
+      echo "[pre-push] Push to a feature branch and open a PR instead."
+      exit 1
+    fi
+  done
+done
+
 # Always start from a clean state
 if curl -sf http://localhost:8000/en-US/account/login > /dev/null 2>&1; then
   echo "[pre-push] Stack is running — tearing down for clean test run..."
