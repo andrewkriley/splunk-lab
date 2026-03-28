@@ -31,6 +31,7 @@ Live health of all lab services — container states, Splunk Web and MCP reachab
 ## Prerequisites
 
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed and running
+- [Node.js](https://nodejs.org/) installed on the host machine (required for MCP integration)
 - Claude Code or Claude Desktop (for MCP integration)
 
 ---
@@ -164,22 +165,20 @@ The Splunk MCP server runs as a container alongside Splunk and exposes an SSE en
 
 > **Security note:** The MCP endpoint requires no authentication and is bound to `127.0.0.1` only — it is not accessible from other machines on the network. This configuration is intentional for local demo use. Do not expose port `8050` to external networks.
 
+> **Why mcp-remote?** Claude Code and Claude Desktop require HTTPS for direct SSE connections. Since the lab MCP server uses plain HTTP on localhost, [`mcp-remote`](https://www.npmjs.com/package/mcp-remote) is used as a local stdio proxy — Claude talks to it over stdio, and it forwards requests to `localhost:8050` over HTTP. No SSL involved. Node.js must be installed on the host for `npx` to work.
+
 ### Claude Code
 
-Add the MCP server to your project:
+The project ships with `.claude/settings.json` pre-configured. No setup required — the MCP server is automatically available when you open Claude Code in the `splunk-lab` directory with the stack running.
 
-```bash
-claude mcp add --transport sse --scope project splunk http://localhost:8050/sse
-```
-
-Or add it manually to `.claude/settings.json`:
+If you need to add it manually:
 
 ```json
 {
   "mcpServers": {
     "splunk": {
-      "type": "sse",
-      "url": "http://localhost:8050/sse"
+      "command": "npx",
+      "args": ["-y", "mcp-remote@0.1.38", "http://localhost:8050/sse"]
     }
   }
 }
@@ -192,19 +191,24 @@ Then start a conversation:
 
 ### Claude Desktop
 
-Add to your `claude_desktop_config.json` (open via **Claude Desktop → Settings → Developer**):
+Open your Claude Desktop config file:
+- **macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
+- **Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
+
+Add the following `mcpServers` block:
 
 ```json
 {
   "mcpServers": {
-    "splunk": {
-      "url": "http://localhost:8050/sse"
+    "splunk-lab": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote@0.1.38", "http://localhost:8050/sse"]
     }
   }
 }
 ```
 
-Restart Claude Desktop — the Splunk tools will appear in the tool list.
+Restart Claude Desktop — the Splunk tools will appear in the tool list whenever the lab stack is running.
 
 ---
 
