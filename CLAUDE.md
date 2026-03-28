@@ -31,17 +31,24 @@ docker compose down -v
 # Rebuild the MCP server image after changes to mcp/Dockerfile
 docker compose build splunk-mcp
 
+# Rebuild the status-api image after changes to status-api/
+docker compose build status-api
+
 # Check container health
 docker compose ps
 ```
 
 ## Architecture
 
-Two services run in Docker Compose:
+Four services run in Docker Compose:
 
-- **splunk** (`splunk/splunk:latest`) — Splunk Enterprise. All ports bound to `127.0.0.1`. Data persisted in the `splunk-var` named volume. The `buttercup_app/` directory is bind-mounted into `/opt/splunk/etc/apps/buttercup_app` and auto-indexed on first boot.
+- **splunk** (`splunk/splunk:10.2.1`) — Splunk Enterprise. All ports bound to `127.0.0.1`. Data persisted in the `splunk-var` named volume. The `buttercup_app/` directory is bind-mounted into `/opt/splunk/etc/apps/buttercup_app` and auto-indexed on first boot.
 
 - **splunk-mcp** (built from `mcp/Dockerfile`) — Official Splunk MCP server (`splunk-mcp-server` npm package). Runs in SSE mode on `127.0.0.1:8050`. Connects to Splunk via internal Docker networking on `splunk:8089`. No MCP endpoint auth — localhost-only by design.
+
+- **lab-guide** (`nginx:alpine`) — Static lab guide served at `127.0.0.1:3000`. Mounts `lab-guide/` as the web root and `lab-guide/nginx.conf` as the nginx config. Proxies `/api/status` to `status-api:8081` so the status dashboard can poll from the browser without a separate port.
+
+- **status-api** (built from `status-api/Dockerfile`) — Python sidecar that exposes `GET /api/status` on port 8081 (internal only). Uses the Docker SDK via a read-only `docker.sock` mount to check container states and probes Splunk Web and MCP HTTP endpoints for service health.
 
 ## Buttercup app
 
@@ -49,7 +56,7 @@ Two services run in Docker Compose:
 
 - `default/inputs.conf` — `monitor://` stanzas that tell Splunk to watch the `data/` directory
 - `default/props.conf` — CSV parsing config for the two CSV sourcetypes
-- `data/` — the actual sample files (`access.log`, `vendor_sales.csv`, `products.csv`)
+- `data/` — the actual sample files (`buttercup_access.txt`, `vendor_sales.csv`, `products.csv`)
 
 Data lands in the `buttercup` index under sourcetypes `buttercup_web`, `buttercup_sales`, and `buttercup_products`.
 

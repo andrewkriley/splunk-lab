@@ -66,7 +66,7 @@ Buttercup Games sample data is automatically indexed at startup — no manual st
 
 ### Buttercup Games sample data
 
-Three datasets are auto-indexed into the `main` index:
+Three datasets are auto-indexed into the `buttercup` index:
 
 | Sourcetype | Description |
 |---|---|
@@ -90,6 +90,16 @@ index=buttercup sourcetype=buttercup_sales | stats sum(units_sold) as total_unit
 index=buttercup sourcetype=buttercup_sales | timechart span=1d sum(revenue) by vendor
 ```
 
+### Lab Guide and Status Dashboard
+
+The lab guide runs at `http://localhost:3000` and serves as the single interface for the lab:
+
+- **Steps 1–3** — click-through setup and guided SPL exercises
+- **Status** — live dashboard showing container health, Splunk Web and MCP service reachability, and OpenTelemetry stack placeholders (auto-refreshes every 10s)
+- **Documentation** — reference material for the lab
+
+The status backend (`status-api`) runs as a sidecar container and exposes `GET /api/status` via the nginx reverse proxy — no separate port required.
+
 ---
 
 ## Importing your own data
@@ -104,7 +114,7 @@ index=buttercup sourcetype=buttercup_sales | timechart span=1d sum(revenue) by v
 
 Your data is immediately searchable:
 ```spl
-index=buttercup sourcetype=csv | head 20
+index=main sourcetype=csv | head 20
 ```
 
 ### From an online source (HEC)
@@ -127,7 +137,7 @@ curl -k https://localhost:8088/services/collector/event \
 
 Then search for your events:
 ```spl
-index=buttercup sourcetype=my_sourcetype
+index=main sourcetype=my_sourcetype
 ```
 
 ---
