@@ -33,6 +33,7 @@ Live health of all lab services — container states, Splunk Web and MCP reachab
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed and running
 - [Node.js](https://nodejs.org/) installed on the host machine (required for MCP integration)
 - Claude Code or Claude Desktop (for MCP integration)
+- A [Splunk Developer License](https://dev.splunk.com/enterprise/dev_license/) (free) to remove the 500 MB/day indexing limit
 
 ---
 
