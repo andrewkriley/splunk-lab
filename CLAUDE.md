@@ -64,6 +64,44 @@ Data lands in the `buttercup` index under sourcetypes `buttercup_web`, `buttercu
 
 All runtime config lives in `.env` (gitignored). See `.env.example` for the full reference. The only required variable is `SPLUNK_PASSWORD`. `SPLUNK_HEC_TOKEN` pre-sets the HEC token so it's known before boot.
 
+## MCP integration
+
+The project ships `.claude/settings.json` with the MCP server pre-configured for Claude Code — no `claude mcp add` required.
+
+**Why mcp-remote instead of `--transport sse`:**
+`claude mcp add --transport sse` requires an HTTPS endpoint. The lab MCP server serves plain HTTP on `localhost:8050`. Using `mcp-remote` as a stdio proxy avoids this — Claude Code communicates with it over stdio, and it forwards requests to `localhost:8050` over HTTP with no SSL involved.
+
+**Claude Code** — automatic via `.claude/settings.json` (committed in this repo):
+```json
+{
+  "mcpServers": {
+    "splunk": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote@0.1.38", "http://localhost:8050/sse"]
+    }
+  }
+}
+```
+
+**Claude Desktop** — one-time manual edit to the machine-local config:
+- macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
+- Windows: `%APPDATA%\Claude\claude_desktop_config.json`
+
+```json
+{
+  "mcpServers": {
+    "splunk-lab": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote@0.1.38", "http://localhost:8050/sse"]
+    }
+  }
+}
+```
+
+Restart Claude Desktop after editing.
+
+**Prerequisite:** Node.js must be installed on the host (for `npx`).
+
 ## Known gotchas
 
 - **Do not name data files with a `.log` extension.** The Splunk Docker image silently blocks all `.log` files under `/opt/splunk/etc/` from being monitored — they never appear in `splunk list monitor` and are never indexed. Use `.txt`, `.csv`, or any other extension instead.

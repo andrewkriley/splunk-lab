@@ -616,16 +616,8 @@ cd splunk-lab</code>
 
             <!-- Claude Code -->
             <div class="tab-pane active" id="pane-code">
-                <h2>Add the MCP server</h2>
-                <p>Run this command from inside the <code>splunk-lab</code> directory:</p>
-                <div class="code-block">
-                    <div class="code-header">
-                        <span class="code-lang">bash</span>
-                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-                    </div>
-                    <code>claude mcp add --transport sse --scope project splunk http://localhost:8050/sse</code>
-                </div>
-                <p>Or add it manually to <code>.claude/settings.json</code>:</p>
+                <h2>No setup required</h2>
+                <p>The project ships with <code>.claude/settings.json</code> pre-configured. Open Claude Code in the <code>splunk-lab</code> directory with the stack running — the Splunk MCP tools are automatically available.</p>
                 <div class="code-block">
                     <div class="code-header">
                         <span class="code-lang">json</span>
@@ -634,12 +626,13 @@ cd splunk-lab</code>
                     <code>{
   "mcpServers": {
     "splunk": {
-      "type": "sse",
-      "url": "http://localhost:8050/sse"
+      "command": "npx",
+      "args": ["-y", "mcp-remote@0.1.38", "http://localhost:8050/sse"]
     }
   }
 }</code>
                 </div>
+                <p class="note">Requires <strong>Node.js</strong> on the host for <code>npx</code>. The MCP server uses <code>mcp-remote</code> as a local proxy — Claude Code communicates over stdio, avoiding the HTTPS requirement for direct SSE connections.</p>
                 <h2>Try these prompts</h2>
                 <div class="card">
                     <ul class="prompt-list">
@@ -654,7 +647,11 @@ cd splunk-lab</code>
             <!-- Claude Desktop -->
             <div class="tab-pane" id="pane-desktop">
                 <h2>Add the MCP server</h2>
-                <p>Open Claude Desktop, go to <strong>Settings → Developer</strong>, then edit <code>claude_desktop_config.json</code>:</p>
+                <p>Open your Claude Desktop config file and add the <code>mcpServers</code> block:</p>
+                <ul style="margin:0 0 1rem 1.25rem; color:var(--text-muted); font-size:0.875rem;">
+                    <li><strong>macOS:</strong> <code>~/Library/Application Support/Claude/claude_desktop_config.json</code></li>
+                    <li><strong>Windows:</strong> <code>%APPDATA%\Claude\claude_desktop_config.json</code></li>
+                </ul>
                 <div class="code-block">
                     <div class="code-header">
                         <span class="code-lang">json</span>
@@ -662,13 +659,15 @@ cd splunk-lab</code>
                     </div>
                     <code>{
   "mcpServers": {
-    "splunk": {
-      "url": "http://localhost:8050/sse"
+    "splunk-lab": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote@0.1.38", "http://localhost:8050/sse"]
     }
   }
 }</code>
                 </div>
-                <p>Restart Claude Desktop — the Splunk tools will appear in the tool list.</p>
+                <p>Restart Claude Desktop — the Splunk tools will appear in the tool list whenever the lab stack is running.</p>
+                <p class="note">Requires <strong>Node.js</strong> on the host for <code>npx</code>.</p>
                 <h2>Try these prompts</h2>
                 <div class="card">
                     <ul class="prompt-list">
