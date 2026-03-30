@@ -80,6 +80,35 @@ jobs:
           echo "Generated changelog:"
           cat CHANGELOG.txt
 
+      - name: Update CHANGELOG.md
+        run: |
+          TAG="${{ steps.version.outputs.tag }}"
+          DATE=$(date +%Y-%m-%d)
+
+          # Build the new section
+          {
+            echo "## ${TAG} — ${DATE}"
+            echo ""
+            cat CHANGELOG.txt
+            echo ""
+          } > new_section.txt
+
+          if [ -f CHANGELOG.md ]; then
+            # Preserve the header line, insert new section after it
+            head -1 CHANGELOG.md > updated_changelog.md
+            echo "" >> updated_changelog.md
+            cat new_section.txt >> updated_changelog.md
+            tail -n +2 CHANGELOG.md >> updated_changelog.md
+          else
+            echo "# Changelog" > updated_changelog.md
+            echo "" >> updated_changelog.md
+            cat new_section.txt >> updated_changelog.md
+          fi
+
+          mv updated_changelog.md CHANGELOG.md
+          echo "Updated CHANGELOG.md:"
+          cat CHANGELOG.md
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
@@ -90,6 +119,14 @@ jobs:
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Commit CHANGELOG.md to main
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add CHANGELOG.md
+          git commit -m "Update CHANGELOG.md for ${{ steps.version.outputs.tag }} [skip ci]"
+          git push origin HEAD:refs/heads/main
 
       - name: Update latest tag
         run: |
