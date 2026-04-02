@@ -4,7 +4,7 @@
 
 ### Architecture overview
 
-This is a Docker Compose lab with 4 services: Splunk Enterprise, Splunk MCP Server, Lab Guide (nginx), and Status API. See `CLAUDE.md` for full architecture details and common commands.
+This is a Docker Compose lab with 5 services: Splunk Enterprise, Splunk MCP Server, Lab Guide (nginx), Status API, and Ask Splunk Chat. See `CLAUDE.md` for full architecture details and common commands.
 
 ### Cloud VM cgroup v2 workarounds
 
@@ -45,12 +45,21 @@ curl -sf http://localhost:8000/en-US/account/login > /dev/null && echo "Splunk r
 .venv/bin/python3 -m pytest tests/ -v
 ```
 
+27 tests total: 15 existing infrastructure tests + 12 MCP protocol tests.
+
 The `buttercup_ready` fixture polls for up to 600 seconds waiting for data indexing. First run after a fresh `docker compose up` takes ~20-60s for data to be searchable.
+
+### MCP protocol gotchas
+
+- **`SPLUNK_HOST` must be hostname-only** (e.g. `splunk`), not a full URL. The upstream `SplunkClient` prepends `https://` itself. Setting `SPLUNK_HOST=https://splunk` produces the broken URL `https://https://splunk:8089` and all MCP→Splunk tool calls silently fail.
+- **Do not prefix MCP `search_oneshot` queries with `search`** — the MCP server prepends it. `search search index=...` returns 0 results.
+- **MCP tests use `mcp_connect()` context manager** (not a pytest fixture) because the MCP SDK's anyio task groups cannot be torn down in a different asyncio task, which pytest-asyncio fixtures do.
 
 ### Key ports (all localhost-only)
 
 | Port | Service |
 |------|---------|
+| 3000 | Ask Splunk Chat UI |
 | 3131 | Lab Guide |
 | 8000 | Splunk Web UI |
 | 8050 | MCP SSE endpoint |
@@ -60,6 +69,10 @@ The `buttercup_ready` fixture polls for up to 600 seconds waiting for data index
 ### Credentials
 
 Default from `.env.example`: `admin` / `Chang3d!`, HEC token `a8b4c2d6-e0f1-4321-9876-abcdef012345`.
+
+### Ask Splunk Chat
+
+The chat service at `:3000` requires `ANTHROPIC_API_KEY` in `.env`. Without it, the container starts but shows a setup prompt. The chat backend connects to the MCP server over SSE, discovers tools, and bridges Claude with Splunk. Configured to use `claude-haiku-4-20250414` by default (override with `CHAT_MODEL` env var).
 
 ### Docker access
 
