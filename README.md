@@ -66,6 +66,18 @@ Architecture reference, configuration table, environment variable descriptions, 
 
 ## Quickstart
 
+### Option A — guided install (recommended for first-time setup)
+
+```bash
+git clone <this-repo>
+cd splunk-lab
+./install.sh
+```
+
+`install.sh` walks through `.env` configuration, starts the stack, waits for Splunk to be ready, confirms all services are up, and optionally sets up `$HOME/.claude/env.sh` for the `splunk-dashboard-gen` skill. It also provides **Update** and **Reset** modes from its main menu.
+
+### Option B — manual setup
+
 **1. Clone and configure**
 
 ```bash
