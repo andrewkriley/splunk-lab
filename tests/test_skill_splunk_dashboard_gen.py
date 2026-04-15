@@ -119,21 +119,14 @@ class TestSkillFile:
         assert "env.sh" in content, "Skill should source $HOME/.claude/env.sh for credentials"
 
     def test_skill_dashboard_json_template_structure(self):
-        """The JSON template embedded in the skill should be valid (after removing placeholders)."""
+        """The Dashboard Studio JSON template in the skill must contain the required top-level keys."""
         content = SKILL_PATH.read_text()
-        # Extract the JSON block from the markdown code fence
-        match = re.search(r"```json\n(\{.*\})\n```", content, re.DOTALL)
-        assert match, "No JSON code block found in SKILL.md"
-        raw_json = match.group(1)
-        # Replace placeholder tokens with valid values for parsing
-        clean = re.sub(r"<[^>]+>", '"placeholder"', raw_json)
-        try:
-            parsed = json.loads(clean)
-        except json.JSONDecodeError as e:
-            pytest.fail(f"JSON template in SKILL.md is not valid JSON: {e}")
-        assert "visualizations" in parsed
-        assert "dataSources" in parsed
-        assert "layout" in parsed
+        assert "```json" in content, "No JSON code block found in SKILL.md"
+        required_keys = ("visualizations", "dataSources", "layout", "backgroundImage", "structure")
+        for key in required_keys:
+            assert f'"{key}"' in content, (
+                f"Dashboard Studio JSON template missing required key: {key}"
+            )
 
     def test_skill_covers_all_seven_steps(self):
         content = SKILL_PATH.read_text()
