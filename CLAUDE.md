@@ -147,6 +147,40 @@ index=buttercup sourcetype=buttercup_web earliest=-2y
 ### Tuning timeouts and result limits
 `search_oneshot` has a configurable axios timeout (default 120 s). For unusually slow queries, set `SPLUNK_TIMEOUT_MS` in `.env`. To cap result size for faster interactive responses, set `SPL_MAX_EVENTS_COUNT=1000` (default is 100 000).
 
+## Skills
+
+This project ships Claude Code skills in `.claude/skills/`. They are project-scoped and available automatically when Claude Code is opened from this directory.
+
+### splunk-dashboard-gen
+
+**Invoke:** `/splunk-dashboard-gen` (or describe what you want — Claude will trigger it)
+
+Generates a Splunk Dashboard Studio dashboard end-to-end:
+1. Runs SPL via the `splunk-lab-guide` MCP to retrieve data
+2. Synthesises a thematic image prompt from the results
+3. Generates a background image via the HuggingFace MCP
+4. Builds Dashboard Studio JSON with the image embedded as base64
+5. Deploys to Splunk via REST API and returns the live URL
+
+**Dependencies:**
+
+| Dependency | Notes |
+|---|---|
+| `splunk-lab-guide` MCP | Already in `.mcp.json` — no action needed |
+| HuggingFace MCP | Must be connected in Claude Code |
+| `$HOME/.claude/env.sh` | Shell credentials file sourced at runtime (not Docker's `.env`) |
+| Lab stack running | `docker compose up -d` |
+
+**`env.sh` setup** (one-time, per machine):
+
+```bash
+cp env.sh.example $HOME/.claude/env.sh
+chmod 600 $HOME/.claude/env.sh
+# Edit $HOME/.claude/env.sh — set SPLUNK_PASS to match SPLUNK_PASSWORD in .env
+```
+
+**Output:** `~/dev/claude-created-dashboards/<slug>/` — background image, dashboard JSON, and wrapped XML. The slug is a lowercase-hyphenated version of the dashboard title.
+
 ## Known gotchas
 
 - **Do not name data files with a `.log` extension.** The Splunk Docker image silently blocks all `.log` files under `/opt/splunk/etc/` from being monitored — they never appear in `splunk list monitor` and are never indexed. Use `.txt`, `.csv`, or any other extension instead.
