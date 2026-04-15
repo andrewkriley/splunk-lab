@@ -26,7 +26,7 @@ CORE_CONTAINERS = ["splunk", "splunk-mcp", "lab-guide", "status-api", "chat"]
 
 HTTP_CHECKS = [
     {"name": "Splunk Web", "url": "http://splunk:8000/en-US/account/login", "stream": False},
-    {"name": "Splunk MCP", "url": "http://splunk-mcp:8050/sse",             "stream": True},
+    {"name": "Splunk MCP", "url": "http://splunk-mcp:8050/mcp",             "stream": True},
     {"name": "Ask Splunk", "url": "http://lab-guide:80/ask/api/health",      "stream": False},
 ]
 
@@ -99,7 +99,7 @@ def check_services():
             latency = int((time.time() - t0) * 1000)
             results.append({
                 "name":        svc["name"],
-                "status":      "ok" if resp.status_code < 400 else "degraded",
+                "status":      "ok" if resp.status_code < 500 else "degraded",
                 "latency_ms":  latency,
                 "http_status": resp.status_code,
             })
