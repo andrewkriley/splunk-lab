@@ -671,10 +671,10 @@ cd splunk-lab</code>
             <!-- Claude Code -->
             <div class="tab-pane active" id="pane-code">
                 <h2>No setup required</h2>
-                <p>The project ships with <code>.claude/settings.json</code> pre-configured. Open Claude Code in the <code>splunk-lab</code> directory with the stack running — the Splunk MCP tools are automatically available.</p>
+                <p>The <strong>Claude Code CLI</strong> reads project MCP config from <code>.mcp.json</code> in the repo root (committed in this lab). <code>.claude/settings.json</code> carries the same <code>mcpServers</code> block for other Claude clients. Open Claude Code in the <code>splunk-lab</code> directory with the stack running.</p>
                 <div class="code-block">
                     <div class="code-header">
-                        <span class="code-lang">json</span>
+                        <span class="code-lang">.mcp.json</span>
                         <button class="copy-btn" onclick="copyCode(this)">Copy</button>
                     </div>
                     <code>{
@@ -686,7 +686,7 @@ cd splunk-lab</code>
   }
 }</code>
                 </div>
-                <p class="note">Requires <strong>Node.js</strong> on the host for <code>npx</code>. The MCP server uses <code>mcp-remote</code> as a local proxy — Claude Code communicates over stdio, avoiding the HTTPS requirement for direct SSE connections.</p>
+                <p class="note">Requires <strong>Node.js</strong> on the host for <code>npx</code>. The MCP server uses <code>mcp-remote</code> as a local proxy — Claude Code communicates over stdio, avoiding the HTTPS requirement for direct SSE connections. If tools do not appear, run <code>claude mcp add -s project splunk-lab-guide -- npx -y mcp-remote@0.1.38 http://localhost:8050/sse</code> to refresh <code>.mcp.json</code>.</p>
                 <h2>Try these prompts</h2>
                 <div class="card">
                     <ul class="prompt-list">
