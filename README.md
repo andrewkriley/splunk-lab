@@ -215,6 +215,46 @@ Then restart: `docker compose up -d`. Open `http://localhost:3131/ask/` and swit
 
 ---
 
+## Skills
+
+This project ships Claude Code skills that work directly with the lab. Skills are project-scoped — they appear automatically when Claude Code is opened from the `splunk-lab` directory.
+
+### splunk-dashboard-gen
+
+Generates a full **Splunk Dashboard Studio** dashboard from any SPL query and deploys it live to the local Splunk instance.
+
+**What it does:**
+1. Runs your SPL via the `splunk-lab-guide` MCP
+2. Generates a thematic background image via HuggingFace AI
+3. Builds the Dashboard Studio JSON with the image embedded
+4. Deploys to Splunk via REST API and returns a direct link
+
+**Prerequisites:**
+
+| Requirement | Setup |
+|---|---|
+| Lab stack running | `docker compose up -d` |
+| `splunk-lab-guide` MCP | Configured in `.mcp.json` — no action needed |
+| HuggingFace MCP | Connect via Claude Code MCP settings |
+| `$HOME/.claude/env.sh` | One-time setup — see below |
+
+**One-time `env.sh` setup:**
+
+```bash
+cp env.sh.example $HOME/.claude/env.sh
+chmod 600 $HOME/.claude/env.sh
+```
+
+Open `$HOME/.claude/env.sh` and set `SPLUNK_PASS` to match the `SPLUNK_PASSWORD` value in your `.env` file. `SPLUNK_HOST` and `SPLUNK_USER` default to `localhost` and `admin` — correct for the local lab.
+
+**Usage** — say to Claude:
+> *"Generate a dashboard from index=buttercup, stats count by status, title: Web Traffic"*
+> *"/splunk-dashboard-gen Buttercup Sales Overview"*
+
+**Output:** `~/dev/claude-created-dashboards/<slug>/` — background PNG, `dashboard.json`, wrapped XML. Live dashboard opens at `http://localhost:8000/en-US/app/search/<slug>`.
+
+---
+
 ## MCP Integration
 
 The Splunk MCP server runs as a container alongside Splunk and exposes a **Streamable HTTP** endpoint at `http://localhost:8050/mcp`. It gives Claude direct access to Splunk search, dashboards, and alerts.

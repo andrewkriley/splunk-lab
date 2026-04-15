@@ -490,6 +490,11 @@
             <div class="step-label">Documentation</div>
         </div>
 
+        <div class="step-item" data-step="6" onclick="goTo(6)">
+            <div class="tool-icon">⚡</div>
+            <div class="step-label">Skills</div>
+        </div>
+
         <hr class="sidebar-hr">
         <div class="sidebar-label">Coming Soon</div>
         <div class="step-item locked">
@@ -1016,6 +1021,70 @@ cd splunk-lab</code>
                     <span class="coming-tag">Coming soon</span>
                 </div>
             </div>
+        </div>
+
+        <!-- ── Skills ────────────────────────────────────────────────────── -->
+        <div class="step-page" id="step-6">
+            <h1>Skills</h1>
+            <p class="intro">Claude Code skills extend what Claude can do from this project directory. The skills below are project-scoped — they activate automatically when Claude Code is opened inside <code>splunk-lab</code> with the stack running.</p>
+
+            <h2>splunk-dashboard-gen</h2>
+            <p style="margin-bottom:16px">Generates a Splunk Dashboard Studio dashboard with an AI-generated background image and deploys it live — all from a single Claude prompt.</p>
+
+            <div class="prereq-grid" style="margin-bottom:24px">
+                <div class="prereq-card">
+                    <div class="prereq-icon">🔌</div>
+                    <div class="prereq-title">splunk-lab-guide MCP</div>
+                    <div class="prereq-desc">Already configured in <code>.mcp.json</code> — no action needed.</div>
+                </div>
+                <div class="prereq-card">
+                    <div class="prereq-icon">🤗</div>
+                    <div class="prereq-title">HuggingFace MCP</div>
+                    <div class="prereq-desc">Connect via Claude Code MCP settings. Required for AI background image generation.</div>
+                </div>
+                <div class="prereq-card">
+                    <div class="prereq-icon">🔑</div>
+                    <div class="prereq-title">env.sh credentials</div>
+                    <div class="prereq-desc">One-time setup — see instructions below. The skill reads Splunk credentials from <code>~/.claude/env.sh</code>.</div>
+                </div>
+                <div class="prereq-card">
+                    <div class="prereq-icon">🐳</div>
+                    <div class="prereq-title">Lab stack running</div>
+                    <div class="prereq-desc"><code>docker compose up -d</code> — Splunk must be up for query and deployment.</div>
+                </div>
+            </div>
+
+            <h2>One-time setup</h2>
+            <p style="margin-bottom:12px">The skill calls the Splunk REST API directly and reads credentials from a shell file separate from Docker's <code>.env</code>:</p>
+            <div class="search-card">
+                <div class="search-header"><span class="search-title">Create ~/.claude/env.sh</span><button class="copy-btn" onclick="copySearch(this)">Copy</button></div>
+                <div class="search-spl">cp env.sh.example $HOME/.claude/env.sh &amp;&amp; chmod 600 $HOME/.claude/env.sh</div>
+            </div>
+            <p style="margin:12px 0">Then open <code>~/.claude/env.sh</code> and set <code>SPLUNK_PASS</code> to match the <code>SPLUNK_PASSWORD</code> value in your <code>.env</code> file. <code>SPLUNK_HOST</code> and <code>SPLUNK_USER</code> default to <code>localhost</code> / <code>admin</code> and are correct for this lab.</p>
+
+            <h2 style="margin-top:24px">How to use</h2>
+            <p style="margin-bottom:12px">Invoke the skill in Claude Code by describing a dashboard or using the slash command. Claude will ask for any missing details.</p>
+
+            <div class="search-card">
+                <div class="search-header"><span class="search-title">Slash command (provides title)</span><button class="copy-btn" onclick="copySearch(this)">Copy</button></div>
+                <div class="search-spl">/splunk-dashboard-gen Buttercup Web Traffic</div>
+            </div>
+            <div class="search-card" style="margin-top:8px">
+                <div class="search-header"><span class="search-title">Natural language example</span><button class="copy-btn" onclick="copySearch(this)">Copy</button></div>
+                <div class="search-spl">Generate a dashboard from index=buttercup, sourcetype=buttercup_sales, stats sum(revenue) as total by vendor | sort -total, title: Sales by Vendor</div>
+            </div>
+
+            <h2 style="margin-top:24px">What Claude will do</h2>
+            <ol style="margin:12px 0 0 20px;line-height:2">
+                <li>Run your SPL via the <code>splunk-lab-guide</code> MCP</li>
+                <li>Synthesise a thematic background image prompt from the data</li>
+                <li>Generate the image via HuggingFace (<code>gr1_z_image_turbo_generate</code>)</li>
+                <li>Build a Dashboard Studio JSON with the image embedded as base64</li>
+                <li>Deploy to Splunk via REST API</li>
+                <li>Return a direct link: <code>http://localhost:8000/en-US/app/search/&lt;slug&gt;</code></li>
+            </ol>
+
+            <p style="margin-top:16px;color:var(--text-secondary);font-size:13px">Output files are saved to <code>~/dev/claude-created-dashboards/&lt;slug&gt;/</code> — background PNG, <code>dashboard.json</code>, and the wrapped XML used for deployment.</p>
         </div>
 
     </main>
