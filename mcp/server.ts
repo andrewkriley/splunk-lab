@@ -732,6 +732,24 @@ async function main() {
 
     // Session map for stateful connections (one transport per client session)
     const transports = new Map<string, StreamableHTTPServerTransport>();
+    const sessionLastSeen = new Map<string, number>();
+
+    const SESSION_TTL_MS = 10 * 60 * 1000;   // 10 minutes idle → evict
+    const EVICTION_INTERVAL_MS = 5 * 60 * 1000; // check every 5 minutes
+
+    const evictStaleSessions = () => {
+      const now = Date.now();
+      for (const [id, lastSeen] of sessionLastSeen) {
+        if (now - lastSeen > SESSION_TTL_MS) {
+          transports.delete(id);
+          sessionLastSeen.delete(id);
+          console.log(`HTTP session ${id} evicted (idle >${SESSION_TTL_MS / 60000} min)`);
+        }
+      }
+    };
+
+    const evictionTimer = setInterval(evictStaleSessions, EVICTION_INTERVAL_MS);
+    evictionTimer.unref(); // don't keep the process alive just for the timer
 
     const httpHandler: express.RequestHandler = async (req, res) => {
       const sessionId = req.headers["mcp-session-id"] as string | undefined;
@@ -745,18 +763,21 @@ async function main() {
           res.status(404).json({ error: `Session not found: ${sessionId}` });
           return;
         }
+        sessionLastSeen.set(sessionId, Date.now()); // refresh TTL on activity
       } else {
         // No session ID — create a new one (SDK rejects non-initialize requests without a session)
         transport = new StreamableHTTPServerTransport({
           sessionIdGenerator: () => randomUUID(),
           onsessioninitialized: (id) => {
             transports.set(id, transport!);
+            sessionLastSeen.set(id, Date.now());
             console.log(`HTTP transport initialized for session ${id}`);
           },
         });
         transport.onclose = () => {
           if (transport!.sessionId) {
             transports.delete(transport!.sessionId);
+            sessionLastSeen.delete(transport!.sessionId);
             console.log(`HTTP transport closed for session ${transport!.sessionId}`);
           }
         };
