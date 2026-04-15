@@ -122,7 +122,7 @@ class TestSkillFile:
         """The JSON template embedded in the skill should be valid (after removing placeholders)."""
         content = SKILL_PATH.read_text()
         # Extract the JSON block from the markdown code fence
-        match = re.search(r"```json\n(\{.*?\})\n```", content, re.DOTALL)
+        match = re.search(r"```json\n(\{.*\})\n```", content, re.DOTALL)
         assert match, "No JSON code block found in SKILL.md"
         raw_json = match.group(1)
         # Replace placeholder tokens with valid values for parsing
