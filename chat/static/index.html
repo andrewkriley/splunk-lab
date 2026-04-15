@@ -5,44 +5,98 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ask Splunk — Splunk Lab</title>
 <style>
-  /* Splunk brand-aligned palette (matches lab-guide/index.html) */
+  /* Fonts + colours from splunk.com clientlib-site (marketing) */
+  @font-face {
+    font-family: splunk_data_sans;
+    font-style: normal;
+    font-weight: 400;
+    src: url("https://www.splunk.com/etc.clientlibs/splunk/core/clientlibs/clientlib-site/resources/resources/fonts/splunkdatasans/woff2/splunkdatasans_w_rg.woff2") format("woff2"),
+         url("https://www.splunk.com/etc.clientlibs/splunk/core/clientlibs/clientlib-site/resources/resources/fonts/splunkdatasans/woff/splunkdatasans_w_rg.woff") format("woff");
+    font-display: swap;
+  }
+  @font-face {
+    font-family: splunk_data_sans;
+    font-style: normal;
+    font-weight: 700;
+    src: url("https://www.splunk.com/etc.clientlibs/splunk/core/clientlibs/clientlib-site/resources/resources/fonts/splunkdatasans/woff2/splunkdatasans_w_bd.woff2") format("woff2"),
+         url("https://www.splunk.com/etc.clientlibs/splunk/core/clientlibs/clientlib-site/resources/resources/fonts/splunkdatasans/woff/splunkdatasans_w_bd.woff") format("woff");
+    font-display: swap;
+  }
+  @font-face {
+    font-family: splunk_data_sans_mono;
+    font-style: normal;
+    font-weight: 400;
+    src: url("https://www.splunk.com/etc.clientlibs/splunk/core/clientlibs/clientlib-site/resources/resources/fonts/splunkdatasans/woff2/splunkdatasansmono_w_rg.woff2") format("woff2"),
+         url("https://www.splunk.com/etc.clientlibs/splunk/core/clientlibs/clientlib-site/resources/resources/fonts/splunkdatasans/woff/splunkdatasansmono_w_rg.woff") format("woff");
+    font-display: swap;
+  }
+
   :root {
-    --bg-primary:    #0c1724;
-    --bg-secondary:  #0f1c2d;
-    --bg-tertiary:   #080f18;
-    --bg-card:       #141e2e;
-    --border:        #233044;
-    --text-primary:  #e2e8f0;
-    --text-secondary:#94a3b8;
-    --accent:        #60ab31;
-    --accent-hover:  #6fbb3a;
-    --accent-dim:    rgba(96, 171, 49, 0.14);
-    --code-bg:       #080f18;
-    --user-bg:       rgba(96, 171, 49, 0.2);
-    --assistant-bg:  var(--bg-card);
-    --green:         #22c55e;
-    --red:           #ef4444;
-    --yellow:        #f59e0b;
-    --font: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    --mono: "SF Mono", "Fira Code", "Cascadia Code", monospace;
+    --splunk-navy:     #0c1724;
+    --splunk-green:    #65a637;
+    --splunk-coral:    #f16221;
+    --splunk-pink:     #eb008b;
+    --splunk-aqua:     #00a9e0;
+    --bg-primary:      var(--splunk-navy);
+    --bg-secondary:    #0e1828;
+    --bg-tertiary:     #080f18;
+    --bg-card:         #121f30;
+    --border:          #233044;
+    --text-primary:    #f0f3f7;
+    --text-secondary:  #c0cfe2;
+    --accent:          var(--splunk-green);
+    --accent-hover:    #7bc142;
+    --accent-dim:      rgba(101, 166, 55, 0.16);
+    --code-bg:         #080f18;
+    --brand-gradient:  linear-gradient(90deg, var(--splunk-green) 0%, var(--splunk-pink) 45%, var(--splunk-coral) 100%);
+    --user-bg:         linear-gradient(135deg, rgba(101, 166, 55, 0.22) 0%, rgba(235, 0, 139, 0.12) 55%, rgba(241, 98, 34, 0.15) 100%);
+    --assistant-bg:    var(--bg-card);
+    --green:           var(--splunk-green);
+    --red:             #ef4444;
+    --yellow:          #f59e0b;
+    --font:            splunk_data_sans, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --mono:            splunk_data_sans_mono, "SF Mono", "Fira Code", monospace;
   }
   * { margin:0; padding:0; box-sizing:border-box; }
   body { font-family:var(--font); background:var(--bg-primary); color:var(--text-primary); height:100vh; display:flex; flex-direction:column; }
 
-  header { height:52px; padding:0 24px; border-bottom:1px solid var(--border); box-shadow:inset 0 -2px 0 0 var(--accent); display:flex; align-items:center; gap:12px; background:var(--bg-secondary); flex-shrink:0; }
+  header {
+    position: relative;
+    height:52px;
+    padding:0 24px;
+    border-bottom:1px solid var(--border);
+    display:flex;
+    align-items:center;
+    gap:12px;
+    background:var(--bg-secondary);
+    flex-shrink:0;
+  }
+  header::after {
+    content:"";
+    position:absolute;
+    left:0; right:0; bottom:0;
+    height:3px;
+    background:var(--brand-gradient);
+    pointer-events:none;
+  }
   header h1 { font-size:15px; font-weight:600; color:#fff; }
   header .badge { font-size:11px; padding:3px 8px; border-radius:12px; background:var(--bg-card); border:1px solid var(--border); color:var(--text-secondary); }
   header .status { margin-left:auto; font-size:12px; display:flex; align-items:center; gap:6px; color:var(--text-secondary); }
   header .dot { width:8px; height:8px; border-radius:50%; }
-  header .dot.ok { background:var(--green); box-shadow:0 0 5px rgba(34,197,94,0.45); }
+  header .dot.ok { background:var(--splunk-green); box-shadow:0 0 6px rgba(101,166,55,0.5); }
   header .dot.err { background:var(--red); }
   header .dot.warn { background:var(--yellow); }
 
   /* Tabs — same pattern as lab guide */
-  .tabs { display:flex; border-bottom:1px solid var(--border); background:var(--bg-secondary); padding:0 24px; }
-  .tab { padding:10px 22px; font-size:13px; font-weight:500; cursor:pointer; color:var(--text-secondary); border-bottom:2px solid transparent; margin-bottom:-1px; transition:0.15s; }
-  .tab:hover { color:var(--text-primary); }
-  .tab.active { color:var(--accent); border-bottom-color:var(--accent); }
+  .tabs {
+    display:flex;
+    border-bottom:1px solid var(--border);
+    background:linear-gradient(90deg, rgba(101,166,55,0.06) 0%, rgba(235,0,139,0.05) 50%, rgba(241,98,34,0.06) 100%), var(--bg-secondary);
+    padding:0 24px;
+  }
+  .tab { padding:10px 22px; font-size:13px; font-weight:500; cursor:pointer; color:var(--text-secondary); border-bottom:3px solid transparent; margin-bottom:-1px; transition:0.15s; }
+  .tab:hover { color:var(--splunk-aqua); }
+  .tab.active { color:#fff; border-bottom-color:var(--splunk-coral); }
   .tab .lock { font-size:10px; margin-left:4px; opacity:0.6; }
 
   .tab-content { display:none; flex:1; min-height:0; overflow:hidden; flex-direction:column; }
@@ -59,6 +113,7 @@
   .tool-item.active .tool-desc { color:var(--text-secondary); }
 
   .tool-panel { flex:1; min-height:0; display:flex; flex-direction:column; overflow:hidden; background:var(--bg-primary); }
+  /* Scrollable pane for tool description + fields (flex min-height:0 allows shrink inside iframe) */
   .tool-form-scroll { flex:1; min-height:0; overflow-y:auto; -webkit-overflow-scrolling:touch; }
   .tool-form { padding:20px 24px; }
   .tool-form h2 { font-size:16px; margin-bottom:4px; color:#fff; }
@@ -69,7 +124,7 @@
     width:100%; background:var(--code-bg); border:1px solid var(--border); color:var(--text-primary);
     padding:8px 12px; border-radius:6px; font-family:var(--mono); font-size:13px; outline:none;
   }
-  .field-group input:focus, .field-group textarea:focus { border-color:var(--accent); }
+  .field-group input:focus, .field-group textarea:focus { border-color:var(--splunk-aqua); }
   .field-group .hint { font-size:11px; color:var(--text-secondary); margin-top:2px; }
 
   .run-bar {
@@ -77,10 +132,11 @@
     display:flex; align-items:center; gap:12px; flex-shrink:0;
   }
   .run-btn {
-    background:var(--accent); color:#fff; border:none; padding:10px 24px; border-radius:6px;
+    background:var(--brand-gradient);
+    color:#fff; border:none; padding:10px 24px; border-radius:6px;
     cursor:pointer; font-size:14px; font-weight:500; transition:0.15s;
   }
-  .run-btn:hover { background:var(--accent-hover); }
+  .run-btn:hover { filter:brightness(1.08); }
   .run-btn:disabled { opacity:0.4; cursor:not-allowed; }
   .run-bar .latency-display { font-size:12px; color:var(--green); font-family:var(--mono); }
 
@@ -89,7 +145,7 @@
   .result-header .latency { color:var(--green); }
   .result-pre {
     background:var(--code-bg); border:1px solid var(--border); padding:16px; border-radius:6px; font-family:var(--mono);
-    font-size:13px; white-space:pre-wrap; word-break:break-word; line-height:1.5; overflow-x:auto; color:#c9d1d9;
+    font-size:13px; white-space:pre-wrap; word-break:break-word; line-height:1.5; overflow-x:auto; color:var(--text-secondary);
   }
 
   .empty-state { flex:1; display:flex; align-items:center; justify-content:center; color:var(--text-secondary); font-size:14px; text-align:center; padding:32px; }
@@ -102,23 +158,23 @@
     background:var(--bg-card); border:1px solid var(--border); color:var(--text-primary); padding:5px 10px;
     border-radius:14px; cursor:pointer; font-size:12px; font-family:var(--mono); transition:0.15s;
   }
-  .qq:hover { border-color:var(--accent); color:var(--accent); }
+  .qq:hover { border-color:var(--splunk-aqua); color:var(--splunk-aqua); }
 
   /* ── Chat ── */
   #chat-area { flex:1; overflow-y:auto; padding:24px; display:flex; flex-direction:column; gap:16px; background:var(--bg-primary); }
   .msg { max-width:720px; line-height:1.6; color:var(--text-primary); }
-  .msg.user { align-self:flex-end; background:var(--user-bg); border:1px solid rgba(96,171,49,0.28); padding:12px 16px; border-radius:16px 16px 4px 16px; }
+  .msg.user { align-self:flex-end; background:var(--user-bg); border:1px solid rgba(241,98,34,0.35); padding:12px 16px; border-radius:16px 16px 4px 16px; }
   .msg.assistant { align-self:flex-start; background:var(--assistant-bg); border:1px solid var(--border); padding:12px 16px; border-radius:16px 16px 16px 4px; }
   .msg.assistant pre { background:var(--code-bg); border:1px solid var(--border); padding:10px 14px; border-radius:6px; overflow-x:auto; margin:8px 0; font-family:var(--mono); font-size:13px; }
   .msg.assistant code { font-family:var(--mono); font-size:13px; background:var(--code-bg); border:1px solid var(--border); padding:2px 5px; border-radius:3px; }
   .msg.assistant pre code { background:none; border:none; padding:0; }
   .tool-card { align-self:flex-start; background:var(--bg-card); border:1px solid var(--border); border-radius:8px; padding:10px 14px; font-size:13px; max-width:720px; width:100%; }
-  .tool-card summary { cursor:pointer; color:var(--accent); font-family:var(--mono); font-weight:500; }
+  .tool-card summary { cursor:pointer; color:var(--splunk-aqua); font-family:var(--mono); font-weight:500; }
   .tool-card pre { margin-top:8px; font-size:12px; white-space:pre-wrap; word-break:break-word; color:var(--text-secondary); max-height:200px; overflow-y:auto; }
 
   #starters { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; padding:16px 24px; background:var(--bg-primary); }
   .starter { background:var(--bg-card); border:1px solid var(--border); color:var(--text-primary); padding:8px 14px; border-radius:20px; cursor:pointer; font-size:13px; transition:0.15s; }
-  .starter:hover { border-color:var(--accent); color:var(--accent); }
+  .starter:hover { border-color:var(--splunk-coral); color:var(--splunk-coral); }
 
   #input-bar { padding:16px 24px; border-top:1px solid var(--border); background:var(--bg-secondary); display:flex; gap:10px; align-items:flex-end; }
   #input-bar textarea {
@@ -126,13 +182,14 @@
     padding:10px 14px; border-radius:6px; font-family:var(--font); font-size:14px; line-height:1.5;
     outline:none; min-height:44px; max-height:120px;
   }
-  #input-bar textarea:focus { border-color:var(--accent); }
+  #input-bar textarea:focus { border-color:var(--splunk-aqua); }
   #input-bar textarea::placeholder { color:var(--text-secondary); }
   #send-btn {
-    background:var(--accent); color:#fff; border:none; width:44px; height:44px; border-radius:6px;
+    background:var(--brand-gradient);
+    color:#fff; border:none; width:44px; height:44px; border-radius:6px;
     cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center; transition:0.15s; flex-shrink:0;
   }
-  #send-btn:hover { background:var(--accent-hover); }
+  #send-btn:hover { filter:brightness(1.08); }
   #send-btn:disabled { opacity:0.4; cursor:not-allowed; }
 
   .no-key-msg { padding:24px; text-align:center; color:var(--text-secondary); background:var(--bg-primary); }
