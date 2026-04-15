@@ -70,12 +70,12 @@ All runtime config lives in `.env` (gitignored). See `.env.example` for the full
 
 ## MCP integration
 
-The project ships `.claude/settings.json` with the MCP server pre-configured for Claude Code — no `claude mcp add` required.
+The project ships **`.mcp.json`** at the repo root for the **Claude Code CLI** (project-scoped MCP). It also ships **`.claude/settings.json`** with the same `mcpServers` entry for other Claude clients that read that path.
 
 **Why mcp-remote instead of `--transport sse`:**
 `claude mcp add --transport sse` requires an HTTPS endpoint. The lab MCP server serves plain HTTP on `localhost:8050`. Using `mcp-remote` as a stdio proxy avoids this — Claude Code communicates with it over stdio, and it forwards requests to `localhost:8050` over HTTP with no SSL involved.
 
-**Claude Code** — automatic via `.claude/settings.json` (committed in this repo):
+**Claude Code CLI** — committed **`.mcp.json`** (also writable via `claude mcp add -s project …`):
 ```json
 {
   "mcpServers": {

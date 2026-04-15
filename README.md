@@ -200,9 +200,17 @@ The Splunk MCP server runs as a container alongside Splunk and exposes an SSE en
 
 ### Claude Code
 
-The project ships with `.claude/settings.json` pre-configured. No setup required — the MCP server is automatically available when you open Claude Code in the `splunk-lab` directory with the stack running.
+The **Claude Code CLI** loads project-scoped MCP servers from **`.mcp.json`** in the repository root (committed here). Open Claude Code in the `splunk-lab` directory with the stack running and the Splunk tools should appear after the CLI picks up the file.
 
-If you need to add it manually:
+The **`.claude/settings.json`** file in this repo uses the same `mcpServers` block for other Claude experiences (for example some Claude Code web or Desktop-related flows). If your environment only reads one of these files, use the snippet below in whichever file your client documents.
+
+If you need to add or refresh the CLI config manually:
+
+```bash
+claude mcp add -s project splunk-lab-guide -- npx -y mcp-remote@0.1.38 http://localhost:8050/sse
+```
+
+That writes the equivalent entry into **`.mcp.json`**. Alternatively, merge this JSON into **`.mcp.json`** (or create the file at the project root):
 
 ```json
 {
