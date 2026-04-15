@@ -6,25 +6,58 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Splunk Lab — Getting Started</title>
     <style>
-        /* Colours aligned with Splunk marketing brand (splunk.com): Apple Green, deep navy, warm accent */
+        /* Typography + hex tokens from splunk.com clientlib-site CSS (marketing site) */
+        @font-face {
+            font-family: splunk_data_sans;
+            font-style: normal;
+            font-weight: 400;
+            src: url("https://www.splunk.com/etc.clientlibs/splunk/core/clientlibs/clientlib-site/resources/resources/fonts/splunkdatasans/woff2/splunkdatasans_w_rg.woff2") format("woff2"),
+                 url("https://www.splunk.com/etc.clientlibs/splunk/core/clientlibs/clientlib-site/resources/resources/fonts/splunkdatasans/woff/splunkdatasans_w_rg.woff") format("woff");
+            font-display: swap;
+        }
+        @font-face {
+            font-family: splunk_data_sans;
+            font-style: normal;
+            font-weight: 700;
+            src: url("https://www.splunk.com/etc.clientlibs/splunk/core/clientlibs/clientlib-site/resources/resources/fonts/splunkdatasans/woff2/splunkdatasans_w_bd.woff2") format("woff2"),
+                 url("https://www.splunk.com/etc.clientlibs/splunk/core/clientlibs/clientlib-site/resources/resources/fonts/splunkdatasans/woff/splunkdatasans_w_bd.woff") format("woff");
+            font-display: swap;
+        }
+        @font-face {
+            font-family: splunk_data_sans_mono;
+            font-style: normal;
+            font-weight: 400;
+            src: url("https://www.splunk.com/etc.clientlibs/splunk/core/clientlibs/clientlib-site/resources/resources/fonts/splunkdatasans/woff2/splunkdatasansmono_w_rg.woff2") format("woff2"),
+                 url("https://www.splunk.com/etc.clientlibs/splunk/core/clientlibs/clientlib-site/resources/resources/fonts/splunkdatasans/woff/splunkdatasansmono_w_rg.woff") format("woff");
+            font-display: swap;
+        }
+
         :root {
-            --bg-primary:    #0c1724;
-            --bg-secondary:  #0f1c2d;
-            --bg-tertiary:   #080f18;
-            --bg-card:       #141e2e;
-            --border:        #233044;
-            --text-primary:  #e2e8f0;
-            --text-secondary:#94a3b8;
-            --accent:        #60ab31;
-            --accent-hover:  #6fbb3a;
-            --accent-dim:    rgba(96, 171, 49, 0.14);
-            --code-bg:       #080f18;
+            --splunk-navy:     #0c1724;
+            --splunk-navy-2:   #001d29;
+            --splunk-green:    #65a637;
+            --splunk-coral:    #f16221;
+            --splunk-pink:     #eb008b;
+            --splunk-aqua:     #00a9e0;
+            --splunk-white:    #ffffff;
+            --bg-primary:      var(--splunk-navy);
+            --bg-secondary:    #0e1828;
+            --bg-tertiary:     #080f18;
+            --bg-card:         #121f30;
+            --border:          #233044;
+            --text-primary:    #f0f3f7;
+            --text-secondary:  #c0cfe2;
+            --accent:          var(--splunk-green);
+            --accent-hover:    #7bc142;
+            --accent-dim:      rgba(101, 166, 55, 0.16);
+            --code-bg:         #080f18;
+            --brand-gradient:  linear-gradient(90deg, var(--splunk-green) 0%, var(--splunk-pink) 45%, var(--splunk-coral) 100%);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-family: splunk_data_sans, "Helvetica Neue", Helvetica, Arial, sans-serif;
             background: var(--bg-primary);
             color: var(--text-primary);
             height: 100vh;
@@ -35,9 +68,9 @@
 
         /* ── Top bar ───────────────────────────────────────────────────────── */
         .topbar {
+            position: relative;
             background: var(--bg-secondary);
             border-bottom: 1px solid var(--border);
-            box-shadow: inset 0 -2px 0 0 var(--accent);
             padding: 0 24px;
             height: 52px;
             display: flex;
@@ -45,9 +78,19 @@
             gap: 12px;
             flex-shrink: 0;
         }
+        .topbar::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 3px;
+            background: var(--brand-gradient);
+            pointer-events: none;
+        }
         .splunk-mark {
             width: 28px; height: 28px;
-            background: linear-gradient(135deg, var(--accent) 0%, #4d9326 100%);
+            background: var(--brand-gradient);
             border-radius: 4px;
             display: flex; align-items: center; justify-content: center;
             font-weight: 800; font-size: 14px; color: #fff; letter-spacing: -0.5px;
@@ -123,7 +166,9 @@
             display: inline-block;
             font-size: 11px; font-weight: 600;
             letter-spacing: 0.06em; text-transform: uppercase;
-            color: var(--accent); background: var(--accent-dim);
+            color: var(--splunk-aqua);
+            background: linear-gradient(120deg, rgba(101, 166, 55, 0.14) 0%, rgba(235, 0, 139, 0.1) 55%, rgba(241, 98, 34, 0.12) 100%);
+            border: 1px solid rgba(0, 169, 224, 0.25);
             padding: 3px 10px; border-radius: 10px;
             margin-bottom: 12px;
         }
@@ -133,8 +178,8 @@
 
         p  { font-size: 14px; color: var(--text-secondary); line-height: 1.65; margin-bottom: 12px; }
 
-        a  { color: var(--accent); text-decoration: none; }
-        a:hover { text-decoration: underline; }
+        a  { color: var(--splunk-aqua); text-decoration: none; }
+        a:hover { color: var(--splunk-coral); text-decoration: underline; }
 
         /* ── Prereq grid ───────────────────────────────────────────────────── */
         .prereq-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 28px; }
@@ -186,7 +231,7 @@
         .code-lang { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-secondary); }
         code {
             display: block; padding: 13px 16px;
-            font-family: 'SF Mono','Fira Code','Consolas',monospace;
+            font-family: splunk_data_sans_mono, "SF Mono", "Fira Code", Consolas, monospace;
             font-size: 13px; line-height: 1.6; color: #c9d1d9;
             white-space: pre; overflow-x: auto;
         }
@@ -203,24 +248,24 @@
             border-radius: 4px; padding: 3px 10px; cursor: pointer;
             transition: all 0.15s;
         }
-        .copy-btn:hover { color: var(--accent); border-color: var(--accent); }
-        .copy-btn.copied { color: var(--accent); border-color: var(--accent); }
+        .copy-btn:hover { color: var(--splunk-aqua); border-color: var(--splunk-aqua); }
+        .copy-btn.copied { color: var(--splunk-coral); border-color: var(--splunk-coral); }
 
         /* ── Notice (info banner) ──────────────────────────────────────────── */
         .notice {
             display: flex; gap: 10px; align-items: flex-start;
             padding: 13px 16px; border-radius: 6px; margin: 0 0 18px;
             font-size: 13px; line-height: 1.5;
-            background: rgba(88,166,255,0.08);
-            border: 1px solid rgba(88,166,255,0.25);
+            background: rgba(0, 169, 224, 0.08);
+            border: 1px solid rgba(0, 169, 224, 0.28);
             color: var(--text-primary);
         }
-        .notice a { color: #58a6ff; text-decoration: none; }
-        .notice a:hover { text-decoration: underline; }
+        .notice a { color: var(--splunk-aqua); text-decoration: none; }
+        .notice a:hover { color: var(--splunk-coral); text-decoration: underline; }
 
         .notice-security {
-            background: rgba(245,158,11,0.08);
-            border-color: rgba(245,158,11,0.28);
+            background: linear-gradient(120deg, rgba(235, 0, 139, 0.1) 0%, rgba(241, 98, 34, 0.12) 100%);
+            border: 1px solid rgba(241, 98, 34, 0.35);
             color: var(--text-primary);
         }
 
@@ -240,7 +285,7 @@
             gap: 8px 20px; font-size: 13px; margin: 12px 0;
         }
         .cred-label { color: var(--text-secondary); }
-        .cred-val   { font-family: 'SF Mono',monospace; color: #fff; }
+        .cred-val   { font-family: splunk_data_sans_mono, "SF Mono", monospace; color: #fff; }
 
         /* ── Table ─────────────────────────────────────────────────────────── */
         .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 20px; }
@@ -266,23 +311,27 @@
         .search-title { font-size: 13px; font-weight: 600; color: #fff; }
         .search-spl {
             padding: 13px 16px;
-            font-family: 'SF Mono','Fira Code',monospace;
-            font-size: 12.5px; line-height: 1.7; color: #79c0ff;
+            font-family: splunk_data_sans_mono, "SF Mono", "Fira Code", monospace;
+            font-size: 12.5px; line-height: 1.7; color: var(--splunk-aqua);
             background: var(--code-bg); white-space: pre; overflow-x: auto;
         }
 
         /* ── Tabs ──────────────────────────────────────────────────────────── */
         .tabs {
-            display: flex; border-bottom: 1px solid var(--border); margin-bottom: 22px;
+            display: flex;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 22px;
+            background: linear-gradient(90deg, rgba(101, 166, 55, 0.06) 0%, rgba(235, 0, 139, 0.05) 50%, rgba(241, 98, 34, 0.06) 100%);
+            border-radius: 8px 8px 0 0;
         }
         .tab {
             padding: 10px 22px; font-size: 13px; font-weight: 500;
             color: var(--text-secondary); cursor: pointer;
-            border-bottom: 2px solid transparent; margin-bottom: -1px;
+            border-bottom: 3px solid transparent; margin-bottom: -1px;
             transition: all 0.15s;
         }
-        .tab:hover { color: var(--text-primary); }
-        .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+        .tab:hover { color: var(--splunk-aqua); }
+        .tab.active { color: #fff; border-bottom-color: var(--splunk-coral); }
         .tab-pane { display: none; }
         .tab-pane.active { display: block; }
 
@@ -294,7 +343,7 @@
             font-size: 13px; color: var(--text-primary);
         }
         .prompt-list li:last-child { border-bottom: none; }
-        .prompt-list li::before { content: '›'; color: var(--accent); font-size: 16px; line-height: 1.2; }
+        .prompt-list li::before { content: '›'; color: var(--splunk-coral); font-size: 16px; line-height: 1.2; }
 
         /* ── Coming soon cards ─────────────────────────────────────────────── */
         .coming-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 8px; }
@@ -327,9 +376,16 @@
             border: 1px solid var(--border);
             background: none; color: var(--text-primary);
         }
-        .nav-btn:hover { border-color: var(--accent); color: var(--accent); }
-        .nav-btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
-        .nav-btn.primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+        .nav-btn:hover { border-color: var(--splunk-aqua); color: var(--splunk-aqua); }
+        .nav-btn.primary {
+            background: var(--brand-gradient);
+            border-color: transparent;
+            color: #fff;
+        }
+        .nav-btn.primary:hover {
+            filter: brightness(1.08);
+            border-color: transparent;
+        }
         .nav-btn:disabled { opacity: 0.3; cursor: default; pointer-events: none; }
         .nav-progress { font-size: 13px; color: var(--text-secondary); }
 
@@ -361,7 +417,7 @@
         }
         .status-card.planned { opacity: 0.45; }
         .status-name {
-            font-family: 'SF Mono','Fira Code',monospace;
+            font-family: splunk_data_sans_mono, "SF Mono", "Fira Code", monospace;
             font-size: 12px; font-weight: 600; color: #fff;
             margin-bottom: 8px;
             display: flex; align-items: center; gap: 8px;
@@ -370,19 +426,19 @@
         .status-dot {
             width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
         }
-        .status-dot.ok   { background: #22c55e; box-shadow: 0 0 5px rgba(34,197,94,0.5); }
+        .status-dot.ok   { background: var(--splunk-green); box-shadow: 0 0 6px rgba(101, 166, 55, 0.55); }
         .status-dot.down { background: #ef4444; }
         .status-dot.warn { background: #f59e0b; }
         .status-dot.gray { background: #475569; }
         .status-text { font-size: 12px; color: var(--text-secondary); }
-        .status-text.ok   { color: #22c55e; }
+        .status-text.ok   { color: var(--splunk-green); }
         .status-text.down { color: #ef4444; }
         .status-text.warn { color: #f59e0b; }
         .status-meta { font-size: 11px; color: var(--text-secondary); margin-top: 6px; }
         .health-badge {
             font-size: 10px; padding: 1px 6px; border-radius: 8px; font-weight: 600;
         }
-        .health-badge.healthy   { background: rgba(34,197,94,0.15);  color: #22c55e; }
+        .health-badge.healthy   { background: rgba(101, 166, 55, 0.18);  color: var(--splunk-green); }
         .health-badge.unhealthy { background: rgba(239,68,68,0.15);  color: #ef4444; }
         .health-badge.starting  { background: rgba(245,158,11,0.15); color: #f59e0b; }
         .planned-badge {
@@ -836,7 +892,7 @@ cd splunk-lab</code>
             </div>
 
             <h3>Data flow</h3>
-            <div class="card" style="padding:20px;font-size:13px;font-family:'SF Mono',monospace;line-height:2;color:var(--text-secondary);overflow-x:auto;white-space:pre;">Browser ──▶ Lab guide (/ask/) ──▶ Ask Splunk API (chat) ──▶ MCP (:8050) ──▶ Splunk (:8089)
+            <div class="card" style="padding:20px;font-size:13px;font-family:splunk_data_sans_mono,'SF Mono',monospace;line-height:2;color:var(--text-secondary);overflow-x:auto;white-space:pre;">Browser ──▶ Lab guide (/ask/) ──▶ Ask Splunk API (chat) ──▶ MCP (:8050) ──▶ Splunk (:8089)
               │                                    │
               │                                    └──▶ Anthropic API (Chat tab only, when API key set)
                                          │
